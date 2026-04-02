@@ -1,0 +1,1745 @@
+ 
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mr. Spark Academy — Learning Games</title>
+
+  <!-- ✅ خط جميل للأطفال من Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Cairo:wght@700;900&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* ===== المتغيرات الأساسية للألوان ===== */
+    :root {
+      --yellow:  #FFD54F;
+      --orange:  #FF7043;
+      --blue:    #29B6F6;
+      --green:   #66BB6A;
+      --purple:  #AB47BC;
+      --bg:      #FFF8E1;
+      --card-back: #29B6F6;
+      --shadow:  rgba(0,0,0,0.18);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Fredoka One', 'Cairo', cursive;
+      background: var(--bg);
+      min-height: 100vh;
+      overflow-x: hidden;
+      /* ===== خلفية نجوم متحركة ===== */
+      background-image:
+        radial-gradient(circle at 15% 20%, #ffe08288 0%, transparent 40%),
+        radial-gradient(circle at 85% 75%, #b3e5fc88 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, #f8bbd088 0%, transparent 60%);
+    }
+
+    /* ===== الهيدر ===== */
+    header {
+      text-align: center;
+      padding: 24px 16px 10px;
+    }
+
+    .logo {
+      font-size: 2.4rem;
+      color: var(--orange);
+      text-shadow: 3px 3px 0 #fff, 5px 5px 0 var(--yellow);
+      letter-spacing: 1px;
+    }
+
+    .logo span { color: var(--blue); }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: #555;
+      margin-top: 4px;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    /* ===== لوحة النقاط ===== */
+    .scoreboard {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin: 16px auto 20px;
+    }
+
+    .score-box {
+      background: white;
+      border-radius: 18px;
+      padding: 10px 22px;
+      font-size: 1rem;
+      font-weight: bold;
+      box-shadow: 0 4px 12px var(--shadow);
+      border: 3px solid var(--yellow);
+      color: #333;
+    }
+
+    .score-box span { color: var(--orange); font-size: 1.3rem; }
+
+    /* ===== شبكة البطاقات ===== */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 14px 30px;
+    }
+
+    @media (max-width: 500px) { .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .logo { font-size: 1.7rem; }
+    }
+
+    /* ===== البطاقة الواحدة ===== */
+    .card {
+      width: 100%;
+      aspect-ratio: 2 / 2.6;
+      perspective: 800px;
+      cursor: pointer;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.5s cubic-bezier(.4,1.4,.6,1);
+      border-radius: 18px;
+    }
+
+    /* ✅ عند الضغط تنقلب البطاقة */
+    .card.flipped .card-inner { transform: rotateY(180deg); }
+
+    /* ✅ الوجه الخلفي للبطاقة (قبل الكشف) */
+    .card-back,
+    .card-front {
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      backface-visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 18px var(--shadow);
+    }
+
+    .card-back {
+      background: linear-gradient(135deg, var(--blue) 0%, #0288d1 100%);
+      border: 4px solid white;
+      font-size: 2.5rem;
+    }
+
+    /* ✅ الوجه الأمامي للبطاقة (بعد الكشف) */
+    .card-front {
+      background: white;
+      border: 4px solid var(--yellow);
+      transform: rotateY(180deg);
+      flex-direction: column;
+      gap: 4px;
+      padding: 8px;
+    }
+
+    /* ✅ بطاقة الحرف */
+    .card-front.letter {
+      background: linear-gradient(135deg, #FFF9C4, #FFF176);
+      border-color: var(--orange);
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    
+
+    /* ✅ كلمة الحرف تحته مباشرة — APPLE تحت A */
+    
+
+    /* ✅ الصورة داخل البطاقة */
+    /* .card-img removed */
+
+
+    
+    /* .card-sprite {
+      width: 100%;
+      flex: 1;
+      background-repeat: no-repeat;
+      border-radius: 8px;
+      min-height: 0;
+    }
+    
+    /* ✅ emoji بديل */
+    /* .card-emoji removed */
+
+    .card-label {
+      font-size: 0.82rem;
+      color: #333;
+      font-family: 'Fredoka One', cursive;
+      font-style: normal;          /* ✅ إزالة الخط المائل */
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* ✅ البطاقة المطابقة تتوهج باللون الأخضر */
+    .card.matched .card-inner {
+      box-shadow: 0 0 0 4px var(--green), 0 6px 20px rgba(102,187,106,0.5);
+    }
+
+    .card.matched .card-front { border-color: var(--green); background: #f1fff3; }
+
+    /* ✅ هزهزة عند الخطأ */
+    @keyframes shake {
+      0%,100% { transform: rotateY(180deg) translateX(0); }
+      25%      { transform: rotateY(180deg) translateX(-6px); }
+      75%      { transform: rotateY(180deg) translateX(6px); }
+    }
+    .card.wrong .card-inner { animation: shake 0.4s ease; }
+
+    /* ===== رسالة الفوز ===== */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .overlay.show { display: flex; }
+
+    .win-box {
+      background: white;
+      border-radius: 28px;
+      padding: 36px 40px;
+      text-align: center;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+      border: 5px solid var(--yellow);
+      max-width: 340px;
+      width: 90%;
+      animation: popIn .5s cubic-bezier(.4,1.4,.6,1);
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.5); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+
+    .win-emoji { font-size: 4rem; }
+
+    .win-title {
+      font-size: 1.8rem;
+      color: var(--orange);
+      margin: 10px 0 6px;
+    }
+
+    .win-msg {
+      font-size: 1rem;
+      color: #555;
+      font-family: 'Cairo', sans-serif;
+      line-height: 1.6;
+    }
+
+    .btn-restart {
+      margin-top: 20px;
+      padding: 12px 32px;
+      background: linear-gradient(135deg, var(--orange), #ff5722);
+      color: white;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(255,112,67,0.4);
+      transition: transform .15s;
+    }
+
+    .btn-restart:hover { transform: scale(1.07); }
+
+    /* ===== شريط المستويات ===== */
+    .levels-bar {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 0 auto 14px;
+      padding: 0 16px;
+      max-width: 680px;
+    }
+
+    .level-btn {
+      padding: 7px 18px;
+      border-radius: 50px;
+      border: 3px solid var(--blue);
+      background: white;
+      color: var(--blue);
+      font-family: 'Fredoka One', cursive;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .level-btn.active {
+      background: var(--blue);
+      color: white;
+      box-shadow: 0 4px 10px rgba(41,182,246,0.4);
+      transform: scale(1.08);
+    }
+
+    .level-btn.done {
+      background: var(--green);
+      border-color: var(--green);
+      color: white;
+    }
+
+    /* ===== شريط التقدم ===== */
+    .progress-wrap {
+      max-width: 400px;
+      margin: 0 auto 16px;
+      padding: 0 16px;
+    }
+
+    .progress-label {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #666;
+      font-family: 'Cairo', sans-serif;
+      margin-bottom: 4px;
+    }
+
+    .progress-bar {
+      height: 12px;
+      background: #e0e0e0;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--green), #43a047);
+      border-radius: 10px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    /* ===== زر إعادة اللعب في الأعلى ===== */
+    .btn-top {
+      display: block;
+      margin: 0 auto 18px;
+      padding: 10px 28px;
+      background: var(--blue);
+      color: white;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1rem;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(41,182,246,0.35);
+      transition: transform .15s;
+    }
+
+    .btn-top:hover { transform: scale(1.05); }
+
+    /* ===== نجوم متطايرة (confetti) ===== */
+    .confetti-piece {
+      position: fixed;
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 200;
+      animation: fall 1.4s ease forwards;
+    }
+
+    @keyframes fall {
+      0%   { opacity: 1; transform: translateY(-20px) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+    }
+  
+    
+    
+
+    /* emoji كبير في وسط البطاقة */
+    
+
+    /* الكلمة الإنجليزية — ضخمة وواضحة */
+    
+
+    
+    
+  
+    
+    /* emoji ضخم يملأ معظم البطاقة */
+    
+
+    /* الكلمة الإنجليزية — ضخمة وواضحة وزرقاء */
+    
+
+    
+    /* emoji في الأعلى */
+    
+
+    /* الكلمة ضخمة جداً وواضحة — تملأ البطاقة */
+    
+
+    /* ══════════════════════════════════════
+       بطاقة الحرف — حرف واحد كبير فقط
+    ══════════════════════════════════════ */
+    .card-front.letter {
+      background: linear-gradient(145deg, #FFF9C4, #FFE082);
+      border-color: var(--orange);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card-letter {
+      font-family: 'Fredoka One', cursive;
+      font-style: normal;
+      font-size: 4.5rem;
+      color: var(--orange);
+      text-shadow: 3px 3px 0 #fff, 5px 5px 0 #ffcc80;
+      line-height: 1;
+      text-align: center;
+    }
+
+    /* ══════════════════════════════════════
+       بطاقة الكلمة — emoji + كلمة ضخمة
+    ══════════════════════════════════════ */
+    .img-card {
+      background: linear-gradient(145deg, #E3F2FD, #BBDEFB);
+      border-color: #1976D2;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 6px;
+    }
+
+    /* emoji كبير يملأ معظم البطاقة */
+    .card-emoji-big {
+      font-size: 2.8rem;
+      line-height: 1;
+      text-align: center;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.12));
+    }
+
+    /* الكلمة — ضخمة جداً، واضحة، ملوّنة */
+    .card-word-big {
+      font-family: 'Fredoka One', cursive;
+      font-style: normal;
+      font-size: 1.25rem;
+      color: #0D47A1;
+      text-align: center;
+      letter-spacing: 2.5px;
+      line-height: 1;
+      word-break: break-word;
+    }
+
+    /* ══════════════════════════════════════
+       وضع الليل / النهار
+    ══════════════════════════════════════ */
+
+    /* النهار — الألوان الافتراضية */
+    :root {
+      --bg-main:     #FFF8E1;
+      --bg-card:     #ffffff;
+      --bg-back:     linear-gradient(135deg, #29B6F6, #0288d1);
+      --bg-letter:   linear-gradient(145deg, #FFF9C4, #FFE082);
+      --bg-word:     linear-gradient(145deg, #E3F2FD, #BBDEFB);
+      --text-main:   #333333;
+      --text-sub:    #555555;
+      --star-color:  #FFD700;
+      --border-word: #1976D2;
+      --shadow:      rgba(0,0,0,0.18);
+      --overlay-bg:  rgba(255,248,225,0.97);
+      --score-bg:    #ffffff;
+      --btn-top-bg:  #29B6F6;
+      --progress-bg: #e0e0e0;
+    }
+
+    /* الليل */
+    body.night-mode {
+      --bg-main:     #0D1B2A;
+      --bg-card:     #1A2B3C;
+      --bg-back:     linear-gradient(135deg, #1565C0, #0D47A1);
+      --bg-letter:   linear-gradient(145deg, #2C2A00, #4A4200);
+      --bg-word:     linear-gradient(145deg, #0A1929, #0D2137);
+      --text-main:   #E8F4FD;
+      --text-sub:    #B0BEC5;
+      --star-color:  #FFD54F;
+      --border-word: #42A5F5;
+      --shadow:      rgba(0,0,0,0.5);
+      --overlay-bg:  rgba(13,27,42,0.97);
+      --score-bg:    #1A2B3C;
+      --btn-top-bg:  #1565C0;
+      --progress-bg: #1A2B3C;
+    }
+
+    /* تطبيق المتغيرات على العناصر */
+    body {
+      background-color: var(--bg-main) !important;
+      background-image:
+        radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--bg-main) 60%, #ffe082) 0%, transparent 40%),
+        radial-gradient(circle at 85% 75%, color-mix(in srgb, var(--bg-main) 60%, #b3e5fc) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--bg-main) 70%, #f8bbd0) 0%, transparent 60%) !important;
+      transition: background-color 0.6s ease, color 0.6s ease;
+      color: var(--text-main);
+    }
+
+    .score-box {
+      background: var(--score-bg) !important;
+      color: var(--text-main) !important;
+      transition: background 0.6s, color 0.6s;
+    }
+
+    .subtitle { color: var(--text-sub) !important; transition: color 0.6s; }
+
+    .card-back {
+      background: var(--bg-back) !important;
+      transition: background 0.6s;
+    }
+
+    .card-back .star-icon { color: var(--star-color); }
+
+    .card-front.letter {
+      background: var(--bg-letter) !important;
+      transition: background 0.6s;
+    }
+
+    .img-card {
+      background: var(--bg-word) !important;
+      border-color: var(--border-word) !important;
+      transition: background 0.6s, border-color 0.6s;
+    }
+
+    .card-word-big { color: var(--border-word) !important; transition: color 0.6s; }
+
+    .btn-top {
+      background: var(--btn-top-bg) !important;
+      transition: background 0.6s;
+    }
+
+    .progress-bar { background: var(--progress-bg) !important; transition: background 0.6s; }
+
+    .win-box {
+      background: var(--score-bg) !important;
+      color: var(--text-main) !important;
+      transition: background 0.6s, color 0.6s;
+    }
+
+    /* ══════ زر الليل/النهار ══════ */
+    .theme-toggle {
+      position: fixed;
+      top: 14px;
+      left: 16px;
+      z-index: 999;
+      width: 52px;
+      height: 28px;
+      background: var(--bg-letter);
+      border: 2px solid #FFD54F;
+      border-radius: 50px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 5px;
+      transition: background 0.4s, border-color 0.4s;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .theme-toggle .t-sun  { font-size: 14px; line-height: 1; }
+    .theme-toggle .t-moon { font-size: 12px; line-height: 1; }
+
+    /* الكرة المتحركة */
+    .theme-toggle .t-ball {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #FFD54F;
+      left: 4px;
+      transition: transform 0.4s cubic-bezier(.4,1.4,.6,1),
+                  background 0.4s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+
+    body.night-mode .theme-toggle .t-ball {
+      transform: translateX(24px);
+      background: #90CAF9;
+    }
+
+    body.night-mode .theme-toggle {
+      border-color: #42A5F5;
+      background: var(--bg-letter);
+    }
+
+    /* انتقال ناعم لكل البطاقات */
+    .card-inner, .card-front, .card-back {
+      transition: background 0.5s ease, border-color 0.5s ease !important;
+    }
+
+    /* نجوم الليل في الخلفية */
+    .night-stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0;
+      transition: opacity 0.8s;
+    }
+    body.night-mode .night-stars { opacity: 1; }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50%       { opacity: 1;   transform: scale(1.3); }
+    }
+    .night-star {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: #fff;
+      border-radius: 50%;
+      animation: twinkle var(--dur, 2s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+
+    /* ══════════════════════════════════════════════════
+       قسم رتّب الجملة
+    ══════════════════════════════════════════════════ */
+
+    /* شريط التنقل بين القسمين */
+    .section-nav {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 0 auto 20px;
+      padding: 0 16px;
+    }
+    .nav-btn {
+      flex: 1;
+      max-width: 200px;
+      padding: 11px 10px;
+      border-radius: 50px;
+      border: 2.5px solid transparent;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all .25s;
+      text-align: center;
+    }
+    .nav-btn.active {
+      background: var(--orange);
+      color: #fff;
+      border-color: var(--orange);
+      box-shadow: 0 4px 12px rgba(255,112,67,.35);
+    }
+    .nav-btn:not(.active) {
+      background: var(--score-bg, #fff);
+      color: var(--orange);
+      border-color: var(--orange);
+    }
+    .nav-btn:not(.active):hover { background: #fff3e0; }
+
+    /* الأقسام */
+    #sectionMatch    { display: block; }
+    #sectionSentence { display: none; }
+
+    /* بطاقة المشهد */
+    .sc-scene {
+      background: var(--score-bg, #fff);
+      border: 0.5px solid rgba(0,0,0,0.1);
+      border-radius: 20px;
+      padding: 20px 14px 16px;
+      text-align: center;
+      margin: 0 16px 14px;
+      box-shadow: 0 4px 14px var(--shadow, rgba(0,0,0,0.1));
+    }
+    .sc-emoji { font-size: 4rem; line-height: 1; margin-bottom: 8px; }
+    .sc-hint  {
+      font-size: 0.85rem;
+      color: var(--text-sub, #666);
+      font-family: 'Cairo', sans-serif;
+      margin-bottom: 6px;
+    }
+
+    /* نقاط التقدم */
+    .sc-dots {
+      display: flex;
+      justify-content: center;
+      gap: 7px;
+      margin: 0 0 12px;
+    }
+    .sc-dot {
+      width: 11px; height: 11px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      transition: background .3s, transform .3s;
+    }
+    .sc-dot.done    { background: var(--green, #66BB6A); }
+    .sc-dot.current { background: var(--blue, #29B6F6); transform: scale(1.3); }
+
+    /* منطقة الإجابة */
+    .sc-slots-lbl, .sc-bank-lbl {
+      text-align: center;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      color: var(--text-sub, #888);
+      margin-bottom: 5px;
+      font-family: 'Cairo', sans-serif;
+    }
+    .sc-slots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+      min-height: 54px;
+      background: var(--score-bg, #fff);
+      border: 2px dashed #bbb;
+      border-radius: 14px;
+      padding: 10px 8px;
+      margin: 0 16px 12px;
+      transition: border-color .3s, background .3s;
+    }
+    .sc-slots.ok  { border-color: #4caf50; background: #e8f5e9; }
+    .sc-slots.err { border-color: #f44336; background: #ffebee; }
+    .sc-slots .empty-hint {
+      font-size: 0.72rem;
+      color: #bbb;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    /* بنك الكلمات */
+    .sc-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      padding: 6px 16px;
+      min-height: 50px;
+      margin-bottom: 14px;
+    }
+
+    /* chip الكلمة */
+    .sc-chip {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1rem;
+      cursor: pointer;
+      border: 2.5px solid transparent;
+      transition: transform .15s, box-shadow .15s, opacity .2s;
+      user-select: none;
+      letter-spacing: .5px;
+    }
+    .sc-chip:hover  { transform: translateY(-3px); box-shadow: 0 5px 12px rgba(0,0,0,.15); }
+    .sc-chip:active { transform: scale(.95); }
+    .sc-chip.bank   { background: var(--score-bg,#fff); border-color: var(--blue,#29B6F6); color: var(--blue,#29B6F6); }
+    .sc-chip.ghost  { opacity: .3; pointer-events: none; }
+    .sc-chip.slot-0 { background: #1565C0; color: #fff; }
+    .sc-chip.slot-1 { background: #6A1B9A; color: #fff; }
+    .sc-chip.slot-2 { background: #2E7D32; color: #fff; }
+    .sc-chip.slot-3 { background: #E65100; color: #fff; }
+    .sc-chip.slot-4 { background: #00695C; color: #fff; }
+    .sc-chip.slot-5 { background: #AD1457; color: #fff; }
+
+    /* أزرار */
+    .sc-btns {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      padding: 0 16px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .sc-btn {
+      padding: 10px 26px;
+      border-radius: 50px;
+      border: none;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .sc-btn:hover  { transform: scale(1.05); }
+    .sc-btn:active { transform: scale(.97); }
+    .sc-btn.clear  { background: #eceff1; color: #546e7a; }
+    .sc-btn.check  { background: var(--green,#66BB6A); color: #fff; box-shadow: 0 4px 10px rgba(102,187,106,.4); }
+    .sc-btn.listen { background: var(--blue,#29B6F6); color: #fff; box-shadow: 0 4px 10px rgba(41,182,246,.4); }
+
+    /* feedback */
+    .sc-feedback {
+      text-align: center;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.05rem;
+      min-height: 30px;
+      padding: 4px 16px;
+      transition: opacity .3s;
+    }
+    .sc-feedback.ok  { color: #2e7d32; }
+    .sc-feedback.err { color: #c62828; }
+
+    /* مستويات الجمل */
+    .sc-levels {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 0 16px;
+      margin-bottom: 16px;
+    }
+    .sc-lvl-btn {
+      padding: 5px 12px;
+      border-radius: 50px;
+      border: 2px solid var(--blue,#29B6F6);
+      background: transparent;
+      color: var(--blue,#29B6F6);
+      font-family: 'Fredoka One', cursive;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .sc-lvl-btn.active { background: var(--blue,#29B6F6); color: #fff; }
+    .sc-lvl-btn.done   { background: var(--green,#66BB6A); border-color: var(--green,#66BB6A); color: #fff; }
+
+    /* header قسم الجمل */
+    .sc-header {
+      text-align: center;
+      padding: 10px 16px 14px;
+    }
+    .sc-title { font-size: 1.5rem; color: var(--blue,#29B6F6); }
+    .sc-sub   { font-size: 0.85rem; color: var(--text-sub,#666); font-family:'Cairo',sans-serif; }
+
+    /* score */
+    .sc-score {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+      padding: 0 16px;
+    }
+    .sc-score-box {
+      background: var(--score-bg,#fff);
+      border-radius: 14px;
+      padding: 8px 18px;
+      font-family: 'Fredoka One', cursive;
+      font-size: 0.9rem;
+      box-shadow: 0 3px 10px var(--shadow,rgba(0,0,0,.1));
+      border: 2px solid var(--yellow,#FFD54F);
+      color: var(--text-main,#333);
+    }
+    .sc-score-box span { color: var(--orange,#FF7043); font-size: 1.1rem; }
+  </style>
+</head>
+<body>
+
+  <!-- ===== الهيدر ===== -->
+  
+  <!-- ===== زر الليل / النهار ===== -->
+  <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Night / Day" aria-label="Toggle theme">
+    <span class="t-sun">☀️</span>
+    <span class="t-ball"></span>
+    <span class="t-moon">🌙</span>
+  </button>
+
+  <!-- نجوم الليل -->
+  <div class="night-stars" id="nightStars"></div>
+
+  <!-- ===== شريط التنقل بين القسمين ===== -->
+  <div class="section-nav">
+    <button class="nav-btn active" data-sec="match"    onclick="showSection('match')">🃏 Match Letters</button>
+    <button class="nav-btn"        data-sec="sentence" onclick="showSection('sentence')">✏️ Build a Sentence</button>
+  </div>
+  <div id="sectionMatch">
+  <header>
+    <div class="logo">⚡ Mr. <span>Spark</span> Academy</div>
+    <div class="subtitle">Fun English Learning Games for Kids!</div>
+  </header>
+
+  <!-- ===== لوحة النقاط ===== -->
+  <div class="scoreboard">
+    <div class="score-box">✅ Matches: <span id="matchCount">0</span></div>
+    <div class="score-box">🎯 Tries: <span id="tries">0</span></div>
+  </div>
+
+  <!-- ===== أزرار المستويات ===== -->
+  <div class="levels-bar" id="levelsBar"></div>
+
+  <!-- ===== شريط التقدم ===== -->
+  <div class="progress-wrap">
+    <div class="progress-label" id="progressLabel">Level 1 — Letters A to F</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <!-- ===== زر إعادة اللعب ===== -->
+  <button class="btn-top" onclick="initGame()">🔄 Restart Level</button>
+
+  <!-- ===== شبكة البطاقات (تُبنى بـ JavaScript) ===== -->
+  <div class="grid" id="grid"></div>
+
+  <!-- ===== نافذة الفوز ===== -->
+  <div class="overlay" id="overlay">
+    <div class="win-box">
+      <div class="win-emoji">🏆</div>
+  </div>
+      <div class="win-title">Amazing!</div>
+      <div class="win-msg">
+        Well done, champion! 🌟<br/>
+        <strong>Mr. Spark</strong> is so proud of you!<br/>
+        You matched all the letters! 🎉
+      </div>
+      <button class="btn-restart" onclick="initGame()">🎮 Play Again</button>
+    </div>
+  </di
+
+  <!-- ══════ قسم رتّب الجملة ══════ -->
+  <div id="sectionSentence">
+
+    <div class="sc-header">
+      <div class="sc-title">✏️ Build a Sentence</div>
+      <div class="sc-sub">Tap the words in the correct order!</div>
+    </div>
+
+    <!-- نقاط -->
+    <div class="sc-score">
+      <div class="sc-score-box">⭐ Score: <span id="scScore">0</span></div>
+      <div class="sc-score-box">📝 Done: <span id="scDone">0</span> / <span id="scTotal">15</span></div>
+    </div>
+
+    <!-- مستويات الجمل -->
+    <div class="sc-levels" id="scLevels"></div>
+
+    <!-- نقاط التقدم -->
+    <div class="sc-dots" id="scDots"></div>
+
+    <!-- بطاقة المشهد -->
+    <div class="sc-scene">
+      <div class="sc-emoji" id="scEmoji">🐱</div>
+      <div class="sc-hint"  id="scHint">What do you see?</div>
+    </div>
+
+    <!-- زر الاستماع -->
+    <div style="text-align:center;margin-bottom:12px">
+      <button class="sc-btn listen" onclick="scListen()">🔊 Listen</button>
+    </div>
+
+    <!-- منطقة الإجابة -->
+    <div class="sc-slots-lbl">YOUR ANSWER — tap a word to remove it</div>
+    <div class="sc-slots" id="scSlots"></div>
+
+    <!-- بنك الكلمات -->
+    <div class="sc-bank-lbl">WORD BANK — tap a word to place it</div>
+    <div class="sc-bank" id="scBank"></div>
+
+    <!-- أزرار -->
+    <div class="sc-btns">
+      <button class="sc-btn clear" onclick="scClear()">🔄 Clear</button>
+      <button class="sc-btn check" onclick="scCheck()">✅ Check</button>
+    </div>
+
+    <!-- feedback -->
+    <div class="sc-feedback" id="scFeedback"></div>
+
+  </div>
+v>
+
+  <script>
+    // ============================================================
+    //  ⬇️ كل الحروف الـ 26 مقسّمة على 5 مستويات (6-5-5-5-5)
+    //
+    //  img: "" ← ضع رابط صورتك هنا
+    //  مثال: img: "images/apple.png"  أو رابط إنترنت
+    //  label: "" ← اسم الكلمة يظهر تحت الصورة
+    // ============================================================
+    const ALL_PAIRS = [
+  {letter:"A", label:"Apple", emoji:"🍎", img:""},
+  {letter:"B", label:"Ball", emoji:"🎈", img:""},
+  {letter:"C", label:"Cat", emoji:"🐱", img:""},
+  {letter:"D", label:"Dog", emoji:"🐶", img:""},
+  {letter:"E", label:"Egg", emoji:"🥚", img:""},
+  {letter:"F", label:"Frog", emoji:"🐸", img:""},
+  {letter:"G", label:"Goat", emoji:"🐐", img:""},
+  {letter:"H", label:"House", emoji:"🏠", img:""},
+  {letter:"I", label:"Igloo", emoji:"🏔️", img:""},
+  {letter:"J", label:"Jump", emoji:"🦘", img:""},
+  {letter:"K", label:"King", emoji:"👑", img:""},
+  {letter:"L", label:"Lamb", emoji:"🐑", img:""},
+  {letter:"M", label:"Mane", emoji:"🦁", img:""},
+  {letter:"N", label:"Night", emoji:"🌙", img:""},
+  {letter:"O", label:"Owl", emoji:"🦉", img:""},
+  {letter:"P", label:"Pig", emoji:"🐷", img:""},
+  {letter:"Q", label:"Queen", emoji:"👸", img:""},
+  {letter:"R", label:"Rabbit", emoji:"🐰", img:""},
+  {letter:"S", label:"Snake", emoji:"🐍", img:""},
+  {letter:"T", label:"Train", emoji:"🚂", img:""},
+  {letter:"U", label:"Umbrella", emoji:"☂️", img:""},
+  {letter:"V", label:"Van", emoji:"🚐", img:""},
+  {letter:"W", label:"Water", emoji:"💧", img:""},
+  {letter:"X", label:"X-Ray", emoji:"🩻", img:""},
+  {letter:"Y", label:"Yo-Yo", emoji:"🪀", img:""},
+  {letter:"Z", label:"Zebra", emoji:"🦓", img:""},
+];
+    // ============================================================
+
+    // ===== تقسيم الحروف على المستويات (6-5-5-5-5) =====
+    const LEVELS = [
+      ALL_PAIRS.slice(0,  6),   // مستوى 1: A-F  = 6 أزواج = 12 بطاقة
+      ALL_PAIRS.slice(6,  11),  // مستوى 2: G-K  = 5 أزواج = 10 بطاقات
+      ALL_PAIRS.slice(11, 16),  // مستوى 3: L-P  = 5 أزواج = 10 بطاقات
+      ALL_PAIRS.slice(16, 21),  // مستوى 4: Q-U  = 5 أزواج = 10 بطاقات
+      ALL_PAIRS.slice(21, 26),  // مستوى 5: V-Z  = 5 أزواج = 10 بطاقات
+    ];
+    const LEVEL_NAMES = ["A – F","G – K","L – P","Q – U","V – Z"];
+
+    // ===== متغيرات اللعبة =====
+    let currentLevel  = 0;       // المستوى الحالي (0-4)
+    let completedLevels = [];    // المستويات المكتملة
+    let flipped = [];
+    let matched  = 0;
+    let tries    = 0;
+    let locked   = false;
+
+    // ===== بناء أزرار المستويات =====
+    function buildLevelsBar() {
+      const bar = document.getElementById('levelsBar');
+      bar.innerHTML = '';
+      LEVELS.forEach((_, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'level-btn' +
+          (i === currentLevel ? ' active' : '') +
+          (completedLevels.includes(i) ? ' done' : '');
+        btn.textContent = (completedLevels.includes(i) ? '✅ ' : '') + 'Level ' + (i+1);
+        btn.onclick = () => { currentLevel = i; initGame(); speakLevel(i+1, LEVEL_NAMES[i]); };
+        bar.appendChild(btn);
+      });
+    }
+
+    // ===== تحديث شريط التقدم =====
+    function updateProgress() {
+      const pct = (matched / LEVELS[currentLevel].length) * 100;
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressLabel').textContent = 'Level ' + (currentLevel+1) + ' — ' + LEVEL_NAMES[currentLevel] + '  (' + matched + '/' + LEVELS[currentLevel].length + ')';
+    }
+
+    // ===== بناء اللعبة =====
+    function initGame() {
+      flipped = []; matched = 0; tries = 0; locked = false;
+      document.getElementById('matchCount').textContent = 0;
+      document.getElementById('tries').textContent = 0;
+      document.getElementById('overlay').classList.remove('show');
+      buildLevelsBar();
+      updateProgress();
+
+      const PAIRS = LEVELS[currentLevel];
+
+      // بناء قائمة البطاقات
+      let cards = [];
+      PAIRS.forEach((pair, i) => {
+        // ✅ label محفوظ في بطاقة الحرف — ده كان سبب الـ TypeError
+        cards.push({ id: i, type: 'letter', value: pair.letter, label: pair.label, pair: i });
+        cards.push({ id: i, type: 'image',  img: pair.img, emoji: pair.emoji, label: pair.label, pair: i });
+      });
+
+      // خلط عشوائي
+      cards.sort(() => Math.random() - 0.5);
+
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      cards.forEach((card, index) => {
+        const el = document.createElement('div');
+        el.className = 'card';
+        el.dataset.pair  = card.pair;
+        el.dataset.index = index;
+
+        const back = document.createElement('div');
+        back.className = 'card-back';
+        back.textContent = '⭐';
+
+        const front = document.createElement('div');
+        if (card.type === 'letter') {
+          front.className = 'card-front letter';
+          // ✅ Letter card: big letter only — no word
+          front.innerHTML = '<div class="card-letter">' + card.value + '</div>';
+          el.dataset.type  = 'letter';
+          el.dataset.speak = card.value;   // ينطق: "A"
+          el.dataset.word  = card.label;   // محتاجه عند التطابق   // محتاجه وقت التطابق
+        } else {
+          front.className = 'card-front img-card';
+          // ✅ Word card: big emoji + big English word
+          front.innerHTML =
+            '<div class="card-emoji-big">' + card.emoji + '</div>' +
+            '<div class="card-word-big">' + card.label.toUpperCase() + '</div>';
+          el.dataset.type  = 'image';
+          el.dataset.speak = card.label;   // ينطق: "Apple"
+          el.dataset.word  = card.label;
+        }
+
+        const inner = document.createElement('div');
+        inner.className = 'card-inner';
+        inner.appendChild(back);
+        inner.appendChild(front);
+        el.appendChild(inner);
+        el.addEventListener('click', () => onCardClick(el));
+        grid.appendChild(el);
+      });
+    }
+
+    // ===== منطق النقر =====
+    function onCardClick(card) {
+      if (locked) return;
+      if (card.classList.contains('flipped')) return;
+      if (card.classList.contains('matched')) return;
+      card.classList.add('flipped');
+      playSound('flip');
+
+      // ✅ ينطق الحرف لو بطاقة حرف، أو الكلمة لو بطاقة صورة
+      speakText(card.dataset.speak);
+
+      flipped.push(card);
+      if (flipped.length === 2) {
+        tries++;
+        document.getElementById('tries').textContent = tries;
+        locked = true;
+        checkMatch();
+      }
+    }
+
+    // ===== التحقق من التطابق =====
+    function checkMatch() {
+      const [a, b] = flipped;
+      if (a.dataset.pair === b.dataset.pair) {
+        a.classList.add('matched');
+        b.classList.add('matched');
+        matched++;
+        document.getElementById('matchCount').textContent = matched;
+        updateProgress();
+        playSound('success');
+
+        // ✅ ينطق "A for Apple" بعد ثانية — الجملة التعليمية الكاملة
+        const letterCard = [a, b].find(c => c.dataset.type === 'letter');
+        const word       = letterCard ? letterCard.dataset.word : '';
+        const letter     = letterCard ? letterCard.dataset.speak : '';
+        setTimeout(() => speakText(`${letter} for ${word}`), 700);
+
+        flipped = [];
+        locked  = false;
+
+        if (matched === LEVELS[currentLevel].length) {
+          // ✅ اكتمل المستوى
+          if (!completedLevels.includes(currentLevel)) completedLevels.push(currentLevel);
+          setTimeout(() => {
+            launchConfetti();
+            if (currentLevel < LEVELS.length - 1) {
+              document.getElementById('overlay').classList.add('show');
+              document.querySelector('.win-msg').innerHTML = `
+                أحسنت يا بطل! 🌟<br/>
+                <strong>Mr. Spark</strong> فخور بك!<br/>
+                جاهز للمستوى ${currentLevel + 2}? 🚀
+              `;
+              document.querySelector('.btn-restart').textContent = '▶️ Next Level';
+              speakWin('Well done! Get ready for Level ' + (currentLevel + 2));
+              document.querySelector('.btn-restart').onclick = () => {
+                currentLevel++;
+                initGame();
+                document.getElementById('overlay').classList.remove('show');
+              };
+            } else {
+              // 🏆 أنهيت كل الحروف!
+              document.getElementById('overlay').classList.add('show');
+              document.querySelector('.win-emoji').textContent = '🎓';
+              document.querySelector('.win-title').textContent = 'You finished the Alphabet!';
+              document.querySelector('.win-msg').innerHTML = `
+                ماشاء الله! تعلمت كل الحروف الـ 26! 🌟<br/>
+                <strong>Mr. Spark</strong> فخور بك جداً جداً! 🎉
+              `;
+              document.querySelector('.btn-restart').textContent = '🔄 Start Over';
+              speakWin('Incredible! You learned all 26 letters! Mr. Spark is so proud of you!');
+              document.querySelector('.btn-restart').onclick = () => {
+                currentLevel = 0; completedLevels = []; initGame();
+                document.getElementById('overlay').classList.remove('show');
+              };
+            }
+            playSound('win');
+          }, 400);
+        }
+      } else {
+        a.classList.add('wrong');
+        b.classList.add('wrong');
+        playSound('wrong');
+        setTimeout(() => {
+          a.classList.remove('flipped', 'wrong');
+          b.classList.remove('flipped', 'wrong');
+          flipped = [];
+          locked  = false;
+        }, 900);
+      }
+    }
+
+    // ============================================================
+    //  🔊 النطق بالصوت — Web Speech API (مجاني، بدون ملفات)
+    //  ينطق الحرف أو الكلمة بالإنجليزية تلقائياً عند كشف البطاقة
+    // ============================================================
+    function speakText(text) {
+      if (!window.speechSynthesis) return;      // المتصفح لا يدعم النطق
+      window.speechSynthesis.cancel();           // أوقف أي نطق قديم
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang  = 'en-US';                    // اللغة إنجليزي
+      utter.rate  = 0.85;                       // سرعة أبطأ قليلاً للأطفال
+      utter.pitch = 1.2;                        // نبرة أعلى (صوت طفولي)
+      window.speechSynthesis.speak(utter);
+    }
+
+    // ============================================================
+    //  🎵 أصوات التأثيرات (flip / success / wrong / win)
+    //  استبدل null بـ: new Audio("sounds/flip.mp3")
+    // ============================================================
+    function playSound(type) {
+      const sounds = {
+        flip:    null,  /* ← new Audio("sounds/flip.mp3")    */
+        success: null,  /* ← new Audio("sounds/success.mp3") */
+        wrong:   null,  /* ← new Audio("sounds/wrong.mp3")   */
+        win:     null,  /* ← new Audio("sounds/win.mp3")     */
+      };
+      if (sounds[type]) { sounds[type].currentTime = 0; sounds[type].play().catch(()=>{}); }
+    }
+
+    // ===== كونفيتي =====
+    function launchConfetti() {
+      const colors = ['#FFD54F','#FF7043','#29B6F6','#66BB6A','#AB47BC'];
+      for (let i = 0; i < 60; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti-piece';
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.top  = '-20px';
+        el.style.background = colors[Math.floor(Math.random() * colors.length)];
+        el.style.animationDelay    = Math.random() * 1.2 + 's';
+        el.style.animationDuration = (1 + Math.random()) + 's';
+        document.body.appendChild(el);
+        el.addEventListener('animationend', () => el.remove());
+      }
+    }
+
+
+    // ══════════════════════════════════════
+    //  وضع الليل / النهار
+    // ══════════════════════════════════════
+    function toggleTheme() {
+      const isNight = document.body.classList.toggle('night-mode');
+      localStorage.setItem('mr-spark-theme', isNight ? 'night' : 'day');
+    }
+
+    // تحميل الثيم المحفوظ
+    function loadTheme() {
+      if (localStorage.getItem('mr-spark-theme') === 'night') {
+        document.body.classList.add('night-mode');
+      }
+    }
+
+    // إنشاء نجوم الليل
+    function createStars() {
+      const container = document.getElementById('nightStars');
+      if (!container) return;
+      for (let i = 0; i < 60; i++) {
+        const star = document.createElement('div');
+        star.className = 'night-star';
+        star.style.setProperty('--dur',   (1.5 + Math.random() * 2.5) + 's');
+        star.style.setProperty('--delay', (Math.random() * 3) + 's');
+        star.style.left = Math.random() * 100 + 'vw';
+        star.style.top  = Math.random() * 60  + 'vh';
+        container.appendChild(star);
+      }
+    }
+
+    // تشغيل عند البداية
+    loadTheme();
+    createStars();
+
+
+    // ============================================================
+    //  جمل اللعبة — 5 مستويات
+    //  عدّل أو أضف جملاً هنا بنفس الشكل
+    // ============================================================
+    const SENTENCE_LEVELS = [
+
+      // ══════ المستوى 1: جمل من كلمتين وثلاث ══════
+      { name:"Level 1", desc:"Very short sentences", sentences:[
+        { emoji:"🐱", hint:"The cat...",    answer:["The","cat","runs"] },
+        { emoji:"🐶", hint:"The dog...",    answer:["The","dog","barks"] },
+        { emoji:"🐟", hint:"The fish...",   answer:["The","fish","swims"] },
+        { emoji:"🐸", hint:"The frog...",   answer:["The","frog","jumps"] },
+        { emoji:"🐦", hint:"The bird...",   answer:["The","bird","flies"] },
+        { emoji:"🐰", hint:"The rabbit...", answer:["The","rabbit","hops"] },
+        { emoji:"🦁", hint:"The lion...",   answer:["The","lion","roars"] },
+        { emoji:"🐘", hint:"The elephant...",answer:["The","elephant","walks"] },
+        { emoji:"🐧", hint:"The penguin...",answer:["The","penguin","slides"] },
+        { emoji:"🐍", hint:"The snake...",  answer:["The","snake","crawls"] },
+        { emoji:"🦓", hint:"The zebra...",  answer:["A","zebra","runs"] },
+        { emoji:"🐷", hint:"The pig...",    answer:["The","pig","eats"] },
+        { emoji:"🐮", hint:"The cow...",    answer:["The","cow","moos"] },
+        { emoji:"🐑", hint:"The sheep...",  answer:["The","sheep","bleats"] },
+        { emoji:"🦊", hint:"The fox...",    answer:["The","fox","hides"] },
+      ]},
+
+      // ══════ المستوى 2: جمل بصفة ══════
+      { name:"Level 2", desc:"Adjectives", sentences:[
+        { emoji:"🍎", hint:"The apple is...",  answer:["The","apple","is","red"] },
+        { emoji:"🍌", hint:"The banana is...", answer:["The","banana","is","yellow"] },
+        { emoji:"🍇", hint:"The grapes are...",answer:["The","grapes","are","purple"] },
+        { emoji:"🌿", hint:"The leaf is...",   answer:["The","leaf","is","green"] },
+        { emoji:"☀️", hint:"The sun is...",    answer:["The","sun","is","hot"] },
+        { emoji:"❄️", hint:"The ice is...",    answer:["The","ice","is","cold"] },
+        { emoji:"🏠", hint:"The house is...",  answer:["The","house","is","big"] },
+        { emoji:"🐭", hint:"The mouse is...",  answer:["The","mouse","is","small"] },
+        { emoji:"🌊", hint:"The sea is...",    answer:["The","sea","is","blue"] },
+        { emoji:"🌸", hint:"The flower is...", answer:["The","flower","is","pink"] },
+        { emoji:"🍋", hint:"The lemon is...",  answer:["The","lemon","is","sour"] },
+        { emoji:"🍯", hint:"The honey is...",  answer:["The","honey","is","sweet"] },
+        { emoji:"🌙", hint:"The night is...",  answer:["The","night","is","dark"] },
+        { emoji:"⛄", hint:"The snow is...",   answer:["The","snow","is","white"] },
+        { emoji:"🔥", hint:"The fire is...",   answer:["The","fire","is","hot"] },
+      ]},
+
+      // ══════ المستوى 3: I can / I like ══════
+      { name:"Level 3", desc:"I can · I like", sentences:[
+        { emoji:"🏃", hint:"I can...",      answer:["I","can","run","fast"] },
+        { emoji:"🏊", hint:"I can...",      answer:["I","can","swim","well"] },
+        { emoji:"🎨", hint:"I can...",      answer:["I","can","draw","pictures"] },
+        { emoji:"📚", hint:"I can...",      answer:["I","can","read","books"] },
+        { emoji:"🎵", hint:"I can...",      answer:["I","can","sing","songs"] },
+        { emoji:"🍕", hint:"I like...",     answer:["I","like","to","eat","pizza"] },
+        { emoji:"🍦", hint:"I like...",     answer:["I","like","ice","cream"] },
+        { emoji:"🐱", hint:"I like...",     answer:["I","like","my","cat"] },
+        { emoji:"⚽", hint:"I like...",     answer:["I","like","to","play","football"] },
+        { emoji:"🌈", hint:"I like...",     answer:["I","like","rainbows"] },
+        { emoji:"🎮", hint:"I love...",     answer:["I","love","to","play","games"] },
+        { emoji:"🌻", hint:"I love...",     answer:["I","love","sunflowers"] },
+        { emoji:"🐶", hint:"I love...",     answer:["I","love","my","dog"] },
+        { emoji:"💤", hint:"I want...",     answer:["I","want","to","sleep"] },
+        { emoji:"🍰", hint:"I want...",     answer:["I","want","a","big","cake"] },
+      ]},
+
+      // ══════ المستوى 4: أفعال الحياة اليومية ══════
+      { name:"Level 4", desc:"Daily actions", sentences:[
+        { emoji:"🌅", hint:"Every morning...",   answer:["I","wake","up","early"] },
+        { emoji:"🪥", hint:"I brush...",         answer:["I","brush","my","teeth"] },
+        { emoji:"🛁", hint:"I take...",          answer:["I","take","a","shower"] },
+        { emoji:"👕", hint:"I put on...",        answer:["I","put","on","my","clothes"] },
+        { emoji:"🥣", hint:"I eat...",           answer:["I","eat","breakfast","every","day"] },
+        { emoji:"🎒", hint:"I go to...",         answer:["I","go","to","school"] },
+        { emoji:"✏️", hint:"I study...",         answer:["I","study","English"] },
+        { emoji:"🍱", hint:"I eat lunch...",     answer:["I","eat","lunch","at","noon"] },
+        { emoji:"🏠", hint:"I go home...",       answer:["I","go","home","after","school"] },
+        { emoji:"📖", hint:"I read...",          answer:["I","read","my","book"] },
+        { emoji:"🍽️", hint:"I eat dinner...",    answer:["We","eat","dinner","together"] },
+        { emoji:"📺", hint:"I watch...",         answer:["I","watch","TV","at","night"] },
+        { emoji:"💤", hint:"I go to sleep...",   answer:["I","go","to","sleep","early"] },
+        { emoji:"🙏", hint:"I pray...",          answer:["I","pray","every","day"] },
+        { emoji:"🧹", hint:"I help...",          answer:["I","help","my","mother"] },
+      ]},
+
+      // ══════ المستوى 5: السؤال والجواب ══════
+      { name:"Level 5", desc:"Questions & answers", sentences:[
+        { emoji:"❓", hint:"What is this?",   answer:["What","is","this"] },
+        { emoji:"🐱", hint:"Is this a cat?",  answer:["Is","this","a","cat"] },
+        { emoji:"🎨", hint:"What color?",     answer:["What","color","is","it"] },
+        { emoji:"📏", hint:"How big?",        answer:["How","big","is","it"] },
+        { emoji:"👆", hint:"Where is it?",    answer:["Where","is","the","ball"] },
+        { emoji:"👧", hint:"Who is she?",     answer:["Who","is","she"] },
+        { emoji:"🕐", hint:"What time?",      answer:["What","time","is","it"] },
+        { emoji:"🌦️", hint:"What is the weather?", answer:["What","is","the","weather","today"] },
+        { emoji:"🎂", hint:"How old?",        answer:["How","old","are","you"] },
+        { emoji:"📍", hint:"Where do you live?", answer:["Where","do","you","live"] },
+        { emoji:"💙", hint:"What do you like?",  answer:["What","do","you","like"] },
+        { emoji:"🏫", hint:"Where do you study?",answer:["Where","do","you","study"] },
+        { emoji:"👨‍👩‍👧", hint:"Who is he?",       answer:["Who","is","your","father"] },
+        { emoji:"🎁", hint:"What do you want?",  answer:["What","do","you","want"] },
+        { emoji:"🐶", hint:"Do you have a pet?", answer:["Do","you","have","a","pet"] },
+      ]},
+
+      // ══════ المستوى 6: الطبيعة والأماكن ══════
+      { name:"Level 6", desc:"Nature & places", sentences:[
+        { emoji:"🌳", hint:"The tree is...",   answer:["The","tree","is","very","tall"] },
+        { emoji:"🌊", hint:"The sea is...",    answer:["The","sea","is","deep","and","blue"] },
+        { emoji:"🏔️", hint:"The mountain is...",answer:["The","mountain","is","very","high"] },
+        { emoji:"🌧️", hint:"It is raining...", answer:["It","is","raining","today"] },
+        { emoji:"🌞", hint:"The sun rises...", answer:["The","sun","rises","in","the","east"] },
+        { emoji:"🌙", hint:"The moon is...",   answer:["The","moon","shines","at","night"] },
+        { emoji:"⭐", hint:"The stars are...", answer:["The","stars","shine","in","the","sky"] },
+        { emoji:"🌻", hint:"The flower grows...",answer:["The","flower","grows","in","the","garden"] },
+        { emoji:"🌵", hint:"The cactus is...", answer:["The","cactus","lives","in","the","desert"] },
+        { emoji:"🏖️", hint:"At the beach...",  answer:["I","love","the","sandy","beach"] },
+        { emoji:"🌲", hint:"The forest is...", answer:["The","forest","is","full","of","trees"] },
+        { emoji:"🦋", hint:"The butterfly...", answer:["The","butterfly","flies","from","flower","to","flower"] },
+        { emoji:"🐝", hint:"The bee...",       answer:["The","bee","makes","sweet","honey"] },
+        { emoji:"🌈", hint:"After rain...",    answer:["A","rainbow","appears","after","rain"] },
+        { emoji:"❄️", hint:"In winter...",     answer:["It","snows","in","winter"] },
+      ]},
+
+      // ══════ المستوى 7: الأسرة والأصدقاء ══════
+      { name:"Level 7", desc:"Family & friends", sentences:[
+        { emoji:"👨", hint:"My father...",      answer:["My","father","is","a","doctor"] },
+        { emoji:"👩", hint:"My mother...",      answer:["My","mother","is","very","kind"] },
+        { emoji:"👦", hint:"My brother...",     answer:["My","brother","is","six","years","old"] },
+        { emoji:"👧", hint:"My sister...",      answer:["My","sister","likes","to","read"] },
+        { emoji:"👴", hint:"My grandfather...", answer:["My","grandfather","tells","great","stories"] },
+        { emoji:"👵", hint:"My grandmother...", answer:["My","grandmother","cooks","delicious","food"] },
+        { emoji:"🤝", hint:"My friend...",      answer:["My","best","friend","is","Ali"] },
+        { emoji:"🏡", hint:"My family...",      answer:["My","family","is","big","and","happy"] },
+        { emoji:"💌", hint:"I love...",         answer:["I","love","my","family","so","much"] },
+        { emoji:"🎉", hint:"We celebrate...",   answer:["We","celebrate","together","every","Eid"] },
+        { emoji:"🤗", hint:"We help...",        answer:["We","help","each","other","every","day"] },
+        { emoji:"🏠", hint:"We live...",        answer:["We","live","in","a","nice","house"] },
+        { emoji:"🍽️", hint:"We eat...",         answer:["We","eat","together","every","evening"] },
+        { emoji:"📞", hint:"I call...",         answer:["I","call","my","friends","after","school"] },
+        { emoji:"🎈", hint:"We play...",        answer:["We","play","together","in","the","park"] },
+      ]},
+
+      // ══════ المستوى 8: المدرسة والتعلم ══════
+      { name:"Level 8", desc:"School & learning", sentences:[
+        { emoji:"🏫", hint:"My school is...",   answer:["My","school","is","very","nice"] },
+        { emoji:"👨‍🏫", hint:"My teacher is...", answer:["My","teacher","is","kind","and","smart"] },
+        { emoji:"📚", hint:"I study...",        answer:["I","study","hard","every","day"] },
+        { emoji:"✏️", hint:"I write...",        answer:["I","write","with","a","pencil"] },
+        { emoji:"📖", hint:"I read...",         answer:["I","read","a","story","book"] },
+        { emoji:"🔢", hint:"I learn...",        answer:["I","learn","numbers","in","math","class"] },
+        { emoji:"🌍", hint:"I learn about...",  answer:["I","learn","about","the","world"] },
+        { emoji:"🎨", hint:"I draw...",         answer:["I","draw","pictures","in","art","class"] },
+        { emoji:"🏃", hint:"I run...",          answer:["I","run","in","the","school","yard"] },
+        { emoji:"🤝", hint:"I help...",         answer:["I","help","my","classmates"] },
+        { emoji:"🎒", hint:"I carry...",        answer:["I","carry","my","bag","to","school"] },
+        { emoji:"⭐", hint:"I get...",          answer:["I","get","a","star","for","good","work"] },
+        { emoji:"📝", hint:"I do...",           answer:["I","do","my","homework","at","home"] },
+        { emoji:"🔬", hint:"We do...",          answer:["We","do","science","experiments","at","school"] },
+        { emoji:"🗣️", hint:"I speak...",        answer:["I","speak","English","with","my","friends"] },
+      ]},
+
+      // ══════ المستوى 9: الطعام والصحة ══════
+      { name:"Level 9", desc:"Food & health", sentences:[
+        { emoji:"🍎", hint:"An apple a day...", answer:["An","apple","a","day","keeps","the","doctor","away"] },
+        { emoji:"🥦", hint:"Vegetables are...", answer:["Vegetables","are","good","for","your","health"] },
+        { emoji:"💧", hint:"Water is...",       answer:["Water","is","very","important","for","the","body"] },
+        { emoji:"🏃", hint:"Exercise is...",    answer:["Exercise","keeps","your","body","strong"] },
+        { emoji:"😴", hint:"Sleep is...",       answer:["Sleep","is","important","for","growing","children"] },
+        { emoji:"🧼", hint:"Wash your hands...",answer:["Wash","your","hands","before","eating"] },
+        { emoji:"🍕", hint:"Pizza is...",       answer:["Pizza","is","my","favorite","food"] },
+        { emoji:"🥛", hint:"Milk is...",        answer:["Milk","makes","your","bones","strong"] },
+        { emoji:"🍊", hint:"Oranges have...",   answer:["Oranges","have","a","lot","of","vitamin","C"] },
+        { emoji:"🚫", hint:"Do not eat...",     answer:["Do","not","eat","too","much","candy"] },
+        { emoji:"🥗", hint:"Eat your...",       answer:["Eat","your","vegetables","every","day"] },
+        { emoji:"😷", hint:"When you are sick...",answer:["See","a","doctor","when","you","are","sick"] },
+        { emoji:"🦷", hint:"Brush your teeth...",answer:["Brush","your","teeth","twice","a","day"] },
+        { emoji:"🌞", hint:"Go outside...",     answer:["Go","outside","and","get","some","sunshine"] },
+        { emoji:"😊", hint:"Be happy...",       answer:["Being","happy","is","good","for","your","health"] },
+      ]},
+
+      // ══════ المستوى 10: جمل مركبة ══════
+      { name:"Level 10", desc:"Complex sentences", sentences:[
+        { emoji:"🐱", hint:"Where does the cat sit?",   answer:["The","cat","sits","on","the","soft","mat"] },
+        { emoji:"🚂", hint:"Describe the train.",       answer:["The","red","train","runs","on","the","track"] },
+        { emoji:"🌅", hint:"What happens at sunrise?",  answer:["The","sun","rises","early","in","the","morning"] },
+        { emoji:"👩‍🍳", hint:"What does she do?",        answer:["My","mother","cooks","delicious","food","for","us"] },
+        { emoji:"🌧️", hint:"What do you do in rain?",  answer:["I","use","my","umbrella","when","it","rains"] },
+        { emoji:"📚", hint:"Why do you study?",         answer:["I","study","hard","to","have","a","bright","future"] },
+        { emoji:"🌳", hint:"Describe the tree.",        answer:["The","tall","green","tree","gives","us","shade"] },
+        { emoji:"🐝", hint:"What does the bee do?",    answer:["The","busy","bee","collects","pollen","from","flowers"] },
+        { emoji:"🏖️", hint:"What do you love about the sea?", answer:["I","love","the","sound","of","the","sea","waves"] },
+        { emoji:"🌈", hint:"When does a rainbow appear?", answer:["A","rainbow","appears","after","the","rain","stops"] },
+        { emoji:"👨‍🏫", hint:"What does your teacher do?", answer:["My","teacher","helps","me","learn","new","things"] },
+        { emoji:"⭐", hint:"What does Mr. Spark say?",  answer:["Mr","Spark","says","you","are","a","great","student"] },
+        { emoji:"💪", hint:"Why do you exercise?",     answer:["I","exercise","to","keep","my","body","fit","and","healthy"] },
+        { emoji:"🤝", hint:"Why do we help?",          answer:["We","help","each","other","because","we","are","friends"] },
+        { emoji:"🌍", hint:"What do you want to do?",  answer:["I","want","to","learn","about","the","whole","world"] },
+      ]},
+    ];
+
+
+    // ============================================================
+    //  🔊 Full English Voice System
+    //  Speaks everything: letters, words, sentences, feedback
+    // ============================================================
+
+    let voiceReady = false;
+    let preferredVoice = null;
+
+    // تحميل أفضل صوت إنجليزي
+    function loadVoice() {
+      const voices = window.speechSynthesis.getVoices();
+      // أولوية: أمريكي → بريطاني → أي إنجليزي
+      preferredVoice =
+        voices.find(v => v.lang === 'en-US' && v.name.includes('Google')) ||
+        voices.find(v => v.lang === 'en-US') ||
+        voices.find(v => v.lang === 'en-GB') ||
+        voices.find(v => v.lang.startsWith('en')) ||
+        null;
+      voiceReady = true;
+    }
+
+    if (window.speechSynthesis) {
+      window.speechSynthesis.onvoiceschanged = loadVoice;
+      loadVoice();
+    }
+
+    // الدالة الأساسية للنطق
+    function speak(text, rate=0.88, pitch=1.1, delay=0) {
+      if (!window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+      setTimeout(() => {
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang  = 'en-US';
+        u.rate  = rate;
+        u.pitch = pitch;
+        if (preferredVoice) u.voice = preferredVoice;
+        window.speechSynthesis.speak(u);
+      }, delay);
+    }
+
+    // نطق متتالي (جملتان الواحدة بعد الأخرى)
+    function speakSequence(texts, rate=0.88, pitch=1.1) {
+      if (!window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+      let i = 0;
+      function next() {
+        if (i >= texts.length) return;
+        const u = new SpeechSynthesisUtterance(texts[i++]);
+        u.lang  = 'en-US';
+        u.rate  = rate;
+        u.pitch = pitch;
+        if (preferredVoice) u.voice = preferredVoice;
+        u.onend = next;
+        window.speechSynthesis.speak(u);
+      }
+      next();
+    }
+
+    // ربط النطق بكل عنصر:
+
+    // 1. ينطق الحرف عند كشف بطاقة الحرف
+    // 2. ينطق الكلمة عند كشف بطاقة الصورة
+    // 3. ينطق "A for Apple!" عند التطابق
+    // (هذه موجودة بالفعل — نحدّث الدالة القديمة)
+
+    const _oldSpeakText = window.speakText;
+    window.speakText = function(text) { speak(text, 0.85, 1.15); };
+
+    // 4. ينطق رسالة الفوز
+    function speakWin(msg) {
+      speak(msg, 0.82, 1.2, 400);
+    }
+
+    // 5. ينطق feedback الجمل
+    function speakFeedback(text) {
+      speak(text, 0.9, 1.1, 200);
+    }
+
+    // 6. ينطق اسم المستوى عند الانتقال
+    function speakLevel(n, letters) {
+      speak('Level ' + n + '. Letters ' + letters, 0.82, 1.0, 300);
+    }
+
+    // ===== ابدأ اللعبة =====
+    initGame();
+
+    // ══════════════════════════════════════════════════
+    //  قسم رتّب الجملة
+    // ══════════════════════════════════════════════════
+
+    let scCurrentLevel = 0;
+    let scCurrentQ     = 0;
+    let scScore        = 0;
+    let scDoneInLevel  = [];
+    let scScrambled    = [];
+    let scInSlots      = [];
+    let scCompletedLevels = [];
+
+    function scShuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length-1; i>0; i--) {
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i],a[j]] = [a[j],a[i]];
+      }
+      return a;
+    }
+
+    function scLoadLevel(lvlIdx) {
+      scCurrentLevel = lvlIdx;
+      scCurrentQ     = 0;
+      scDoneInLevel  = [];
+      scInSlots      = [];
+      scBuildLevelBtns();
+      scLoadQuestion();
+      const lvl = SENTENCE_LEVELS[lvlIdx];
+      speak(lvl.name + '. ' + lvl.desc, 0.85, 1.0, 200);
+    }
+
+    function scLoadQuestion() {
+      const lvl = SENTENCE_LEVELS[scCurrentLevel];
+      const q   = lvl.sentences[scCurrentQ];
+      document.getElementById('scEmoji').textContent = q.emoji;
+      document.getElementById('scHint').textContent  = q.hint;
+      speak(q.hint, 0.85, 1.1, 500);
+      document.getElementById('scFeedback').textContent = '';
+      document.getElementById('scFeedback').className   = 'sc-feedback';
+      document.getElementById('scSlots').className       = 'sc-slots';
+      scInSlots  = [];
+      scScrambled = scShuffle(q.answer);
+      scRenderDots();
+      scRenderBank();
+      scRenderSlots();
+    }
+
+    function scBuildLevelBtns() {
+      const el = document.getElementById('scLevels');
+      el.innerHTML = '';
+      SENTENCE_LEVELS.forEach((lvl, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'sc-lvl-btn' +
+          (i === scCurrentLevel    ? ' active' : '') +
+          (scCompletedLevels.includes(i) ? ' done'   : '');
+        btn.textContent = (scCompletedLevels.includes(i) ? '✅ ' : '') + lvl.name;
+        btn.onclick = () => scLoadLevel(i);
+        el.appendChild(btn);
+      });
+    }
+
+    function scRenderDots() {
+      const el = document.getElementById('scDots');
+      el.innerHTML = '';
+      const total = SENTENCE_LEVELS[scCurrentLevel].sentences.length;
+      for (let i = 0; i < total; i++) {
+        const d = document.createElement('div');
+        d.className = 'sc-dot' +
+          (scDoneInLevel.includes(i) ? ' done' : i===scCurrentQ ? ' current' : '');
+        el.appendChild(d);
+      }
+    }
+
+    function scRenderBank() {
+      const el = document.getElementById('scBank');
+      el.innerHTML = '';
+      scScrambled.forEach((word, i) => {
+        const chip = document.createElement('button');
+        chip.className = 'sc-chip ' + (scInSlots.includes(i) ? 'ghost' : 'bank');
+        chip.textContent = word;
+        chip.onclick = () => scAddWord(i);
+        el.appendChild(chip);
+      });
+    }
+
+    function scRenderSlots() {
+      const el = document.getElementById('scSlots');
+      el.innerHTML = '';
+      if (scInSlots.length === 0) {
+        el.innerHTML = '<span class="empty-hint">👆 Tap words below to build your sentence</span>';
+        return;
+      }
+      scInSlots.forEach((idx, pos) => {
+        const chip = document.createElement('button');
+        chip.className = 'sc-chip slot-' + (pos % 6);
+        chip.textContent = scScrambled[idx];
+        chip.onclick = () => scRemoveWord(pos);
+        el.appendChild(chip);
+      });
+    }
+
+    function scAddWord(idx) {
+      if (scInSlots.includes(idx)) return;
+      if (scInSlots.length >= SENTENCE_LEVELS[scCurrentLevel].sentences[scCurrentQ].answer.length) return;
+      scInSlots.push(idx);
+      scRenderBank();
+      scRenderSlots();
+    }
+
+    function scRemoveWord(pos) {
+      scInSlots.splice(pos, 1);
+      scRenderBank();
+      scRenderSlots();
+    }
+
+    function scClear() {
+      scInSlots = [];
+      scRenderBank();
+      scRenderSlots();
+      document.getElementById('scFeedback').textContent = '';
+      document.getElementById('scSlots').className = 'sc-slots';
+    }
+
+    function scCheck() {
+      const q = SENTENCE_LEVELS[scCurrentLevel].sentences[scCurrentQ];
+      const userAns = scInSlots.map(i => scScrambled[i]);
+      const correct = JSON.stringify(userAns) === JSON.stringify(q.answer);
+      const fb   = document.getElementById('scFeedback');
+      const slot = document.getElementById('scSlots');
+
+      if (correct) {
+        scScore += 10;
+        document.getElementById('scScore').textContent = scScore;
+        if (!scDoneInLevel.includes(scCurrentQ)) scDoneInLevel.push(scCurrentQ);
+        document.getElementById('scDone').textContent = scDoneInLevel.length;
+        document.getElementById('scTotal').textContent = SENTENCE_LEVELS[scCurrentLevel].sentences.length;
+        fb.textContent = '🎉 Correct! ' + q.answer.join(' ') + '!';
+        speakFeedback('Correct! ' + q.answer.join(' '));
+        fb.className   = 'sc-feedback ok';
+        slot.className = 'sc-slots ok';
+        speakSentence(q.answer.join(' '));
+
+        const total = SENTENCE_LEVELS[scCurrentLevel].sentences.length;
+        if (scDoneInLevel.length === total && !scCompletedLevels.includes(scCurrentLevel)) {
+          scCompletedLevels.push(scCurrentLevel);
+          scBuildLevelBtns();
+        }
+
+        setTimeout(() => {
+          if (scCurrentQ < total - 1) {
+            scCurrentQ++;
+            scLoadQuestion();
+          } else if (scCurrentLevel < SENTENCE_LEVELS.length - 1) {
+            fb.textContent = '🏆 Level complete! Mr. Spark is proud of you!';
+          speakWin('Level complete! Mr. Spark is so proud of you!');
+          } else {
+            fb.textContent = '🎓 You finished ALL levels! You are a STAR! ⭐';
+          speakWin('Amazing! You finished all ten levels! You are a superstar!');
+          }
+        }, 2000);
+
+      } else {
+        fb.textContent = '🤔 Not quite! Try again...';
+        speakFeedback('Not quite! Try again!');
+        fb.className   = 'sc-feedback err';
+        slot.className = 'sc-slots err';
+        setTimeout(() => { slot.className = 'sc-slots'; }, 600);
+      }
+    }
+
+    function scListen() {
+      const q = SENTENCE_LEVELS[scCurrentLevel].sentences[scCurrentQ];
+      speakSentence(q.answer.join(' '));
+    }
+
+    function speakSentence(text) {
+      if (!window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'en-US'; u.rate = 0.82; u.pitch = 1.1;
+      window.speechSynthesis.speak(u);
+    }
+
+    // تبديل الأقسام
+    function showSection(sec) {
+      document.getElementById('sectionMatch').style.display    = sec==='match'    ? 'block' : 'none';
+      document.getElementById('sectionSentence').style.display = sec==='sentence' ? 'block' : 'none';
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('.nav-btn[data-sec="'+sec+'"]').classList.add('active');
+      if (sec === 'sentence' && document.getElementById('scLevels').innerHTML === '') {
+        scLoadLevel(0);
+      }
+    }
+
+    // init الجمل
+    scBuildLevelBtns();
+  </script>
+</body>
+</html>
